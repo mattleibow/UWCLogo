@@ -2,7 +2,22 @@
 
 namespace UWCLogo;
 
-public class LogoEngine
+public interface ILogoEngine
+{
+    void Backward(double distance);
+
+    void Forward(double distance);
+
+    void Left(double angle);
+
+    void Right(double angle);
+
+    void PenDown();
+
+    void PenUp();
+}
+
+public class LogoEngine : ILogoEngine
 {
     private readonly SKPaint turlePaint = new()
     {
@@ -22,45 +37,51 @@ public class LogoEngine
 
     private SKCanvas? currentCanvas;
 
+    private bool isPenDown = true;
+
+    public LogoCommand? Command { get; set; }
+
     public void Draw(SKCanvas canvas, int w, int h)
     {
         currentCanvas = canvas;
 
-
+        // setup canvas
         canvas.Clear(SKColors.White);
-
         canvas.Translate(w / 2, h / 2);
         canvas.Scale(3);
 
-
         // draw shape
-        OnDraw();
-
+        Command?.Execute(this);
 
         // draw origin and turtle
         DrawTurtle();
 
-
         currentCanvas = null;
     }
 
-    protected virtual void OnDraw()
-    {
-    }
+    // drawing commands
 
     public void Forward(double distance) => DrawLine(distance);
-    
+
     public void Backward(double distance) => DrawLine(-distance);
 
     public void Right(double angle) => Rotate(angle);
-    
+
     public void Left(double angle) => Rotate(-angle);
+
+    public void PenDown() => isPenDown = true;
+
+    public void PenUp() => isPenDown = false;
+
+    // helpers
 
     private void DrawLine(double length)
     {
         var l = (float)length;
 
-        currentCanvas?.DrawLine(0, 0, 0, -l, linePaint);
+        if (isPenDown)
+            currentCanvas?.DrawLine(0, 0, 0, -l, linePaint);
+
         currentCanvas?.Translate(0, -l);
     }
 

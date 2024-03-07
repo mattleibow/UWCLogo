@@ -6,7 +6,9 @@ namespace UWCLogo;
 
 public partial class MainPage : ContentPage
 {
-    private LogoEngine engine = new OctagonShape();
+    private readonly LogoEngine engine = new()
+    {
+    };
 
     public MainPage()
     {
@@ -15,6 +17,41 @@ public partial class MainPage : ContentPage
 
     private void OnExecuteClicked(object sender, EventArgs e)
     {
+        engine.Command =
+            new GroupCommand(
+                // down here
+                new RepeatCommand(90,
+                    new GroupCommand(
+                        new ForwardCommand(1),
+                        new RightCommand(1)
+                    )
+                ),
+                // up here
+                new PenUpCommand(),
+                new RepeatCommand(90,
+                    new GroupCommand(
+                        new ForwardCommand(1),
+                        new RightCommand(1)
+                    )
+                ),
+                // down here
+                new PenDownCommand(),
+                new RepeatCommand(90,
+                    new GroupCommand(
+                        new ForwardCommand(1),
+                        new RightCommand(1)
+                    )
+                ),
+                // up here
+                new PenUpCommand(),
+                new RepeatCommand(90,
+                    new GroupCommand(
+                        new ForwardCommand(1),
+                        new RightCommand(1)
+                    )
+                )
+            );
+
         drawingSurface.InvalidateSurface();
     }
 
