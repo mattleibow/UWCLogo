@@ -2,6 +2,8 @@
 using SkiaSharp;
 using SkiaSharp.Views.Maui;
 
+using UWCLogo.Engine;
+
 namespace UWCLogo;
 
 public partial class MainPage : ContentPage
@@ -15,42 +17,21 @@ public partial class MainPage : ContentPage
         InitializeComponent();
     }
 
+    List<LogoCommand> commands = new List<LogoCommand>();
+
     private void OnExecuteClicked(object sender, EventArgs e)
     {
-        engine.Command =
-            new GroupCommand(
-                // down here
-                new RepeatCommand(90,
-                    new GroupCommand(
-                        new ForwardCommand(1),
-                        new RightCommand(1)
-                    )
-                ),
-                // up here
-                new PenUpCommand(),
-                new RepeatCommand(90,
-                    new GroupCommand(
-                        new ForwardCommand(1),
-                        new RightCommand(1)
-                    )
-                ),
-                // down here
-                new PenDownCommand(),
-                new RepeatCommand(90,
-                    new GroupCommand(
-                        new ForwardCommand(1),
-                        new RightCommand(1)
-                    )
-                ),
-                // up here
-                new PenUpCommand(),
-                new RepeatCommand(90,
-                    new GroupCommand(
-                        new ForwardCommand(1),
-                        new RightCommand(1)
-                    )
-                )
-            );
+        try
+        {
+            var command = LogoCompiler.Compile(commandEntry.Text);
+            commands.Add(command);
+
+            engine.Command = new GroupCommand(commands.ToArray());
+        }
+        catch (Exception ex)
+        {
+            commandHistory.Text += ex.Message + Environment.NewLine;
+        }
 
         drawingSurface.InvalidateSurface();
     }

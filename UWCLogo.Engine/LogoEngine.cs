@@ -1,6 +1,6 @@
 ﻿using SkiaSharp;
 
-namespace UWCLogo;
+namespace UWCLogo.Engine;
 
 public interface ILogoEngine
 {
@@ -15,6 +15,8 @@ public interface ILogoEngine
     void PenDown();
 
     void PenUp();
+
+    void ClearScreen();
 }
 
 public class LogoEngine : ILogoEngine
@@ -50,6 +52,9 @@ public class LogoEngine : ILogoEngine
         canvas.Translate(w / 2, h / 2);
         canvas.Scale(3);
 
+        // create a new savepoint
+        canvas.Save();
+
         // draw shape
         Command?.Execute(this);
 
@@ -72,6 +77,18 @@ public class LogoEngine : ILogoEngine
     public void PenDown() => isPenDown = true;
 
     public void PenUp() => isPenDown = false;
+
+    public void ClearScreen()
+    {
+        // restore to the last savepoint
+        currentCanvas?.Restore();
+
+        // clear the canvas
+        currentCanvas?.Clear(SKColors.White);
+
+        // create a new savepoint
+        currentCanvas?.Save();
+    }
 
     // helpers
 
