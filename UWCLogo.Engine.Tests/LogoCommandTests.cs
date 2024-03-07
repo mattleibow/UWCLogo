@@ -1,3 +1,5 @@
+using NSubstitute;
+
 namespace UWCLogo.Engine.Tests;
 
 public class LogoCommandTests
@@ -40,5 +42,44 @@ public class LogoCommandTests
         var str = cmd.ToString();
 
         Assert.Equal("repeat 3 [ fd 100 rt 90 ]", str);
+    }
+
+    [Fact]
+    public void Test()
+    {
+        var engine = Substitute.For<ILogoEngine>();
+
+        engine.GetNewRandom(200)
+            .Returns(x => new ConstantDoubleCommandValue(100));
+        
+        var command =
+            new ForwardCommand(
+                new LogoCommandCommandValue(
+                    new RandomCommand(200)));
+
+        var value = command.Execute(engine);
+
+        Assert.IsType<VoidCommandValue>(value);
+
+        engine.Received().Forward(100);
+    }
+
+    [Fact]
+    public void RandomDoesEvaluateToARandomNumber()
+    {
+        var pendingValue = 
+            new LogoCommandCommandValue(
+                new RandomCommand(200));
+
+        var engine = Substitute.For<ILogoEngine>();
+
+        engine.GetNewRandom(200)
+            .Returns(x => new ConstantDoubleCommandValue(100));
+
+        var value = pendingValue.ToDouble(engine);
+
+        engine.Received().GetNewRandom(200);
+
+        Assert.Equal(100, value);
     }
 }

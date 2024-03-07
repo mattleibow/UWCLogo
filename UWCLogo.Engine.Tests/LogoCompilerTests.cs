@@ -94,4 +94,14 @@ public class LogoCompilerTests
 
         Assert.StartsWith(errorPosition, error.Message);
     }
+
+    [Theory]
+    [InlineData("forward 100", "fd 100")]
+    [InlineData("forward random 200", "fd random 200")]
+    public void ForwardCommandCanReadValues(string source, string expected)
+    {
+        var command = LogoCompiler.Compile(source);
+
+        Assert.Equal(expected, command.ToString());
+    }
 }

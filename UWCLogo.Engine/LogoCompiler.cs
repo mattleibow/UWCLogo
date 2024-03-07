@@ -40,8 +40,8 @@ public class LogoCompiler
             }
             else if (IsCommand(word, "forward") || IsCommand(word, "fd"))
             {
-                var distance = ParseDouble(source, ref cursor);
-                commands.Add(new ForwardCommand(distance));
+                var value = ParseValue(source, ref cursor);
+                commands.Add(new ForwardCommand(value));
             }
             else if (IsCommand(word, "backward") || IsCommand(word, "bk"))
             {
@@ -91,6 +91,34 @@ public class LogoCompiler
         }
 
         return new GroupCommand(commands.ToArray());
+    }
+
+    private static CommandValue ParseValue(ReadOnlySpan<char> source, ref int cursor)
+    {
+        var (start, end) = ParseWord(source, ref cursor);
+        var word = source[start..end];
+
+        if (word.Length == 0)
+            throw new InvalidOperationException($"[{start}, {end}] Expected a value at position {start}.");
+
+        if (char.IsDigit(word[0]))
+        {
+            if (!double.TryParse(word, out var number))
+                throw new InvalidOperationException($"[{start}, {end}] Expected a number at position {start} but found '{word}'.");
+
+            return new ConstantDoubleCommandValue(number);
+        }
+
+        if (IsCommand(word, "random"))
+        {
+            //var value = ParseValue(source, ref cursor);
+            var value = ParseInteger(source, ref cursor);
+
+            return new LogoCommandCommandValue(
+                new RandomCommand(value));
+        }
+
+        throw new InvalidOperationException($"[{start}, {end}] Expected a value or command at position {start} but found '{word}'.");
     }
 
     private static double ParseDouble(ReadOnlySpan<char> source, ref int cursor)

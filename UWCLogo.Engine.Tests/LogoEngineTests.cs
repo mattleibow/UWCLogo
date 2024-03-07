@@ -42,4 +42,36 @@ public class LogoEngineTests
             engine.Forward(100);
         });
     }
+
+    [Fact]
+    public void RandomDoesCallGetNewRandom()
+    {
+        var command = new RandomCommand(200);
+
+        var engine = Substitute.For<ILogoEngine>();
+
+        command.Execute(engine);
+
+        engine.Received().GetNewRandom(200);
+    }
+
+    [Fact]
+    public void RandomDoesEvaluateToARandomNumber()
+    {
+        var command = new RandomCommand(200);
+
+        var engine = Substitute.For<ILogoEngine>();
+
+        engine.GetNewRandom(200)
+            .Returns(x => new ConstantDoubleCommandValue(100));
+
+        var value = command.Execute(engine);
+
+        engine.Received().GetNewRandom(200);
+
+        var constant = Assert.IsAssignableFrom<ConstantDoubleCommandValue>(value);
+
+        Assert.Equal(100, constant.Value);
+        Assert.Equal(100, value.ToDouble(engine));
+    }
 }

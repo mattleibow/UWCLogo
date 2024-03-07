@@ -17,6 +17,8 @@ public interface ILogoEngine
     void PenUp();
 
     void ClearScreen();
+
+    CommandValue GetNewRandom(int maxValue);
 }
 
 public class LogoEngine : ILogoEngine
@@ -126,5 +128,11 @@ public class LogoEngine : ILogoEngine
         turtlePath.LineTo(17, 0);
         turtlePath.Close();
         return turtlePath;
+    }
+
+    public CommandValue GetNewRandom(int maxValue)
+    {
+        var rnd = Random.Shared.Next(maxValue);
+        return new ConstantDoubleCommandValue(rnd);
     }
 }
